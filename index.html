@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For You</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #fdfbf7;
+            --ink: #332f2e;
+            --accent: #8c6a5d;
+            --soft-red: #d4a3a3;
+        }
+
+        body {
+            background-color: #f4f1ea;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            width: 15%;
+            align-items: center;
+            height: 30vh;
+            font-family: 'EB Garamond', serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* The Final Message Layer (Hidden initially) */
+        #end-screen {
+            position: absolute;
+            text-align: center;
+            left: 18%;
+            top: 25%;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            z-index: 0;
+            width: 70%;
+        }
+
+        #end-screen h2 { color: var(--accent); font-style: italic; }
+        .heart { color: var(--soft-red); font-size: 2rem; margin: 20px 0; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* The Paper Cards */
+        .page {
+            width: 80vw;
+            max-width: 320px;
+            height: 60vh;
+            background: var(--paper);
+            padding: 40px 30px;
+            position: absolute;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s;
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+
+        /* Spine Shadow for realism */
+        .page::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 10px;
+            background: linear-gradient(to right, rgba(0,0,0,0.02), transparent);
+        }
+
+        .poem-title { font-size: 1rem; color: var(--accent); margin-bottom: 25px; font-style: italic; }
+        .poem-content { font-size: 0.95rem; line-height: 1.2; color: var(--ink); white-space: pre-line; }
+
+        .tossed {
+            transform: translateY(-110vh) rotate(-15deg) !important;
+            opacity: 0;
+        }
+
+        .restart-btn {
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 20px;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 20px;
+        }
+
+        .counter {
+            position: fixed;
+            bottom: 40px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+.noti{
+    position: absolute;
+    width: 200px;
+    top: 20%;
+    left: 30%;
+    z-index: 100;
+    height: auto    ;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--ink) 1px 1px 30px;
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 15px;
+    background: var(--paper);
+    text-align: center;
+}
+
+
+/* Floating Hearts Animation */
+.heart {
+    position: fixed;
+    bottom: -10vh;
+    font-size: 24px;
+    color: #e5989b;
+    user-select: none;
+    pointer-events: none;
+    animation: floatUp 5s linear forwards;
+    z-index: 1000;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+}
+.verify-btn {
+    background: linear-gradient(45deg, #b56576, #6d597a);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Serif', serif;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(181, 101, 118, 0.3);
+    transition: 0.3s;
+}
+
+.verify-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(181, 101, 118, 0.5);
+}
+
+/* Dark background blur */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 40%;
+    left: 10%;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px); /* Blurs the background */
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* The Box itself */
+.modal-content {
+    background: #fffaf0; /* Parchment white */
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 400px;
+    width: 80%;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-heart { font-size: 50px; display: block; margin-bottom: 10px; }
+
+h2 { color: #b56576; font-family: 'Serif', serif; }
+
+.modal-subtext { font-size: 0.9rem; color: #666; font-style: italic; margin-top: 15px; }
+
+.modal-btn {
+    margin-top: 25px;
+    padding: 12px 30px;
+    background: #b56576;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.modal-btn:hover { background: #6d597a; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+    <!--
+    <div class="noti" id="noti">
+        <div id="verification-zone">
+    <p>This gift is locked for everyone except the Lae Lae Lay.if you are My Lovely L3 >> Verify Hah</p>
+    <button class="verify-btn" onclick="proveIdentity() ; openEnvelope()">I am the one</button>
+            <h3>or</h3>
+        <p class="modal-subtext">Share this to Lae Lae Lay ,so you can enjoy the poems too </p>
+        <button class="modal-btn" onclick="shareTelegram()">Share</button>
+</div>
+-->
+<div id="custom-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="modal-heart">💖</span>
+        <h2>Verification Successful</h2>
+        <p>Welcome, Lovely Lae. The stars have confirmed your identity.</p>
+        <p class="modal-subtext">Click below to send a signal back to the one who wrote this for you.</p>
+        <button class="modal-btn" onclick="goToTelegram()">Send a Signal ✨</button>
+
+    </div>
+</div>
+    </div>
+
+    <div id="end-screen">
+        <div class="heart">♥</div>
+        <h2>I hope these brought a smile to your face.</h2>
+        <p>Thinking of you always.</p>
+        <button class="restart-btn" onclick="location.reload()">Read Again</button>
+        <button class="restart-btn" onclick="shareTelegram()">Share</button>
+    </div>
+
+    <div id="book-container"></div>
+    <div class="counter" id="count">1 / 7</div>
+
+<audio id="bg-music" loop>
+    <source src="lovee.m4a" type="audio/mpeg">
+</audio>
+    <script>
+
+        const poems = [
+            { title: "For Lae Lae Lay", content: "A collection of thoughts\nwritten just for you (i even tried to write sonnet which are not actual sonnet :)).\n\n(Tap each page to turn)" },
+            { title: "Poem I : The Rhythem of Lae Lae Lay", content: "What do you say\nWhen she comes close to me,\n\nBeyond her physical presence,\nEven her energy waves\nSway my heart into believing\nThat angels are born not only in heaven,\nBut also right in front of me.\n\nWhen we gathered for Ice cream\nIn the classroom for a teacher’s birthday,\nThe way she cared and helped others\nWas so good-natured—\nSweeter to me than the ice-screen itself.\n\nsee eye to eye with her,\nMy heart begins to beat\nTo the rhythm of “Lae, Lae, Lay,”\nAgain and again." },
+            { title: "Poem II : Lae Lae Lay Everywhere", content: "Oh, once my soul fell for these beautiful things,\nAll of a sudden, my surroundings lit up with twinkling rays,\nSwaying gently, moving with crystal-clear reflections,\nA beauty the Burmese name Lae Lae Lay.\n\nThat is the beauty my soul fell for—\nThe only one I see, the one I feel everywhere.\nThe sunlight is Lae Lae Lay,\nThe moonlight is Lae Lae Lay,\nThe twinkle-twinkle of bright stars is Lae Lae Lay.\n\nEspecially these October stars—\nThe sight I see is the ray of Lae Lae Lay,\nThe sound I hear is my heart beating\nTo the rhythm of Lae Lae Lay.\nThese are the things I call beautiful." },
+            { title: "Poem III : Gift ,Glitter ,Win", content: "The beauty of her soul shines with quiet grace,\nWhere words rise gently to paint the moment\nWhen we stand side by side, closer than before,\nIn that one classroom photo.\n\nHer height doesn’t reach my head,\nBut her energy is strong enough to sway my heart.\nA kiss on her third eye,\nShe finds her rest in the Bagan sunset,\nWhere the Irrawaddy flows and the dust turns gold.\nA thousand silent temples stand like souls.\n\nIn my quiet room, my heart feels blessed,\nEnjoying the beauty held within her eyes.\nShe is truly a Gift—her name begins with it.\nHer eyes glitter softly, like her middle name.\nAnd her last name, meaning Win,\nHas already won my heart." },
+            { title: "Poem IV : Love to truly Share", content: "Though the class moves heavy and slow,\nI feel so light within your inner glow.\nAt the end of each class, when our eyes meet,\nOur hearts burst—and suddenly, class feels right to me.\n\nYou are smart enough to shine the brightest in the room,\nOne day, you’ll learn far beyond school walls and rules.\nSomehow, you’ll need someone to truly support you,\nAnd I would love to share what you need and watch you bloom.\n\nI show my love by filling the gaps around your beauty,\nIn my eyes, you’re a rose among all other flowers truly.\nI love to see my rose grow, overcoming setbacks strong,\nStrengthening her beauty, letting her bloom free and long.\n\nSo bloom your best—I cherish the beauty of your soul.\nRemember, there’s someone you can truly ask for support." },
+            { title: "Poem V: The Dawn of Lae Lae Lay", content: "Once my soul falls in love,\nMy surroundings fill with Lae Lae Lay all at once.\nThe sunlight is Lae Lae Lay,\nThe moonlight is Lae Lae Lay,\nAnd even the dawn\nIs Lae Lae Lay." },
+            { title: "Poem VI : October's Grace", content: "Cherish the stars on October’s night,\nSee the lovely sky so full of joy,\nLove the sky and stars feel calm and right,\nFor her sweet beauty never can annoy.\n\nCherish an October-born lady,\nHer grace lights up my heart amazingly,\nSee she’s so lovely, hair flowing wavy,\nI plan to confess my love sincerely.\n\nBut words flew off each time I tried to speak,\nFor my heart chose her only to share love,\nNever to possess, nor make her weak,\nBut to fill her world with the light thereof.\n\nSo may her heart feel full of blessed delight,\nAnd know my love shines truly, pure, and bright." },
+            { title: "The Last One", content: "Dear Lovely Lae Lae Lay , i could update more for you  \n  " }
+        ];
+
+        const container = document.getElementById('book-container');
+        const counter = document.getElementById('count');
+        const endScreen = document.getElementById('end-screen');
+        const noti = document.getElementById('noti')
+        const modal = document.getElementById('custom-modal')
+        let currentCount = 0;
+//
+        function openmodal() {
+            modal.style.display = "block"
+        }
+
+        function renderBook() {
+            // We use poems.length - 1 because the first "page" is a cover
+            const totalPoemPages = poems.length;
+            
+            [...poems].reverse().forEach((poem, index) => {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.style.zIndex = index + 1;
+                
+                page.innerHTML = `
+                    <div class="poem-title">${poem.title}</div>
+                    <div class="poem-content">${poem.content}</div>
+                `;
+
+                page.onclick = () => {
+                spawnHeart();
+                openEnvelope();
+                    page.classList.add('tossed');
+                    currentCount++;
+                    
+                    if (currentCount < totalPoemPages) {
+                        counter.innerText = `${currentCount + 1} / ${totalPoemPages}`;
+                    } else {
+                        counter.style.opacity = "0";
+                        showEndScreen();
+                    }
+                    
+                    setTimeout(() => page.remove(), 700);
+                };
+
+                container.appendChild(page);
+            });
+        }
+
+        function showEndScreen() {
+            setTimeout(() => {
+                endScreen.style.opacity = "1";
+            }, 300);
+        }
+
+        renderBook();
+
+        function openEnvelope() {
+
+    //const env = document.getElementById('envelope');
+    const music = document.getElementById('bg-music');
+
+    // 1. Open the flap
+    //env.classList.add('open');
+
+    // 2. Play music
+    if (music) music.play();
+
+    // 3. Start Heart Rain
+    setInterval(spawnHeart, 400);
+
+    // 4. Slide the poem out after flap opens
+    setTimeout(() => {
+        // You can add logic here to show your poem cards
+        // Example: document.getElementById('poem-container').classList.add('visible');
+    }, 1000);
+}
+
+function spawnHeart() {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.innerHTML = '❤️';
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = Math.random() * 20 + 10 + 'px';
+    h.style.duration = Math.random() * 3 + 2 + 's';
+    
+    document.body.appendChild(h);
+    
+    setTimeout(() => h.remove(), 5000);
+}
+const mySite = "https://your-laelaelay-site.vercel.app";
+const shareText = "I just received a beautiful gift of poems... ✨";
+function shareTelegram() {
+    const url = `https://t.me/share/url?url=${encodeURIComponent(mySite)}&text=${encodeURIComponent(shareText)}`;
+    window.open(url, '_blank');
+}
+function verifyIdentity() {
+    const yourUsername = "YourTelegramUsername"; // Put your username here
+    const secretMessage = encodeURIComponent("I opened the envelope, and I'm the one you're looking for... ❤️");
+    window.location.href = `https://t.me/${yourUsername}?text=${secretMessage}`;
+}
+function proveIdentity() {
+    // 1. Create a massive burst of hearts
+    for(let i=0; i<30; i++) {
+        setTimeout(spawnHeart, i * 50);
+    }
+
+    // 2. Alert or Sweet Message
+document.getElementById('custom-modal').style.display = 'flex';
+    // Optional: add extra hearts when this opens
+    for(let i=0; i<15; i++) {
+        setTimeout(spawnHeart, i * 100);
+    }
+    closenoti();
+
+}
+
+
+function goToTelegram() {
+        const myUser = "@A_ungg"; // Replace with your username
+    const message = encodeURIComponent("Your Lovely Lae Lae Lay has arrived... I loved the poems. i am the one you are looking for ❤️");
+    const urll = `https://t.me/${myUser}?text=${message}`;
+    window.open( urll , '_blank')
+
+    // 3. Redirect to your Telegram after 2 seconds
+   // setTimeout(() => {
+     //   const myUser = "@A_ungg"; // e.g., denn_heart
+       // window.location.href = `https://t.me/${myUser}?text=I%20am%20the%20one%20you%20wrote%20these%20for...`;
+    //}, 2000);
+}
+    </script>
+</body>
+</html>
